@@ -1,8 +1,20 @@
 const express=require("express");
 const fs=require("fs");
 const app=express();
+const mys=require("express-session");//function
+
 app.use(express.static("."));
 app.use(express.urlencoded({extended:true}));
+app.use(mys({
+    secret:"ASDAD#$!!",
+    resave:false,
+    saveUninitialized:false,
+    cookie:{
+        maxAge:1000*60*60
+    }
+}))
+
+
 
 app.post("/signup",(req,res)=>{
     //Users.json ->array of objects
@@ -52,10 +64,17 @@ let result=users.filter((item)=>{
 if(result.length==0)
     res.send("Invalid user/passwoprd");
 else
-    res.send("Welcom user");
+{
+    req.session.name=result[0].name;
 
+res.redirect("/dashboard")
+}
 
     })
+
+})
+app.get("/dashboard",(req,res)=>{
+    res.send("Welcome "+req.session.name);
 
 })
 
